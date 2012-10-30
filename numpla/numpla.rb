@@ -127,8 +127,8 @@ __MODEL__
 	for row in 1..9
 		fp.write("#{row}")
 		for col in 1..9
-            fp.write(" ")
-            fp.write(koma["#{row}#{col}"])
+			fp.write(" ")
+			fp.write(koma["#{row}#{col}"])
 		end
 		fp.write("\n")
 	end
