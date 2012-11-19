@@ -22,7 +22,7 @@ object Prime {
 	def main(args: Array[String]) =
 		primes take args(0).toInt foreach println
 
-	lazy val primes: Stream[Long] = 2L #:: 3L #:: 5L #:: generate(5L)
+	val primes: Stream[Long] = 2L #:: 3L #:: 5L #:: generate(5L)
 
 	private def generate(n: Long): Stream[Long] = {
 		val p = next(n + 2, primes)
