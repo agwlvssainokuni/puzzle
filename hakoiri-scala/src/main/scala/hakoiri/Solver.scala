@@ -1,5 +1,7 @@
 package hakoiri
 
+import scala.collection.mutable
+
 object Solver extends App {
 
 }
@@ -7,51 +9,45 @@ object Solver extends App {
 trait Hakoiri {
 
   type Coord = (Int, Int)
-  type Board = Map[Coord, String]
+  type Board = mutable.Map[Coord, String]
   val width: Int
   val height: Int
 
-  def layout(koma: List[Koma], board: Board = Map()): Option[Board] =
-    koma match {
-      case Nil =>
-        Some(board)
-      case k :: ks =>
-        layoutOne(k.name, k.coords, board) match {
-          case None =>
-            None
-          case Some(b) =>
-            layout(ks, b)
-        }
-    }
-
-  def layoutOne(name: String, coords: List[Coord], board: Board): Option[Board] =
-    coords match {
-      case Nil =>
-        Some(board)
-      case c :: cs =>
-        if (board contains c)
-          None
+  def board(koma: Seq[Koma]): Option[Board] = {
+    val result: Board = mutable.Map()
+    val kiter = koma.iterator
+    while (kiter.hasNext) {
+      val km = kiter.next()
+      val citer = km.coords.iterator
+      while (citer.hasNext) {
+        val xy = citer.next()
+        if (result contains xy)
+          return None
         else
-          layoutOne(name, cs, (board + ((c, name))))
+          result += ((xy, km.name))
+      }
     }
+    Some(result)
+  }
 
   case class Koma(name: String, x: Int, y: Int, w: Int, h: Int) {
-    def move: List[Koma] =
-      List(-1, 1) flatMap { dx =>
-        List(-1, 1) flatMap { dy =>
+    def move: Seq[Koma] =
+      Seq(-1, 1) flatMap { dx =>
+        Seq(-1, 1) flatMap { dy =>
           if (x + dx < 0 || x + dx + (w - 1) > width - 1)
-            List()
+            Seq()
           else if (y + dy < 0 || y + dy + (h - 1) > height - 1)
-            List()
+            Seq()
           else
-            List(Koma(name, x + dx, y + dy, w, h))
+            Seq(Koma(name, x + dx, y + dy, w, h))
         }
       }
-    def coords: List[Coord] =
-      (0 until w).toList flatMap { dx =>
-        (0 until h).toList map { dy =>
-          (x + dx, y + dy)
-        }
+    def coords: Seq[Coord] =
+      for {
+        dx <- 0 until w
+        dy <- 0 until h
+      } yield {
+        (x + dx, y + dy)
       }
   }
 
