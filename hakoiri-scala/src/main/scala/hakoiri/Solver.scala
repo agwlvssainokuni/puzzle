@@ -1,5 +1,7 @@
 package hakoiri
 
+import scala.annotation.tailrec
+
 object Solver extends App with Hakoiri {
   val width = 4
   val height = 5
@@ -14,6 +16,11 @@ object Solver extends App with Hakoiri {
     Koma("H", 2, 3, 1, 1),
     Koma("I", 0, 4, 1, 1),
     Koma("J", 3, 4, 1, 1))
+
+  def isGoal(board: Board): Boolean =
+    board exists { koma =>
+      koma.name == "A" && koma.x == 1 && koma.y == 3
+    }
 
   solve(start).zipWithIndex foreach {
     case (path, number) =>
@@ -38,6 +45,8 @@ trait Hakoiri {
 
   val width: Int
   val height: Int
+
+  def isGoal(board: Board): Boolean
 
   def board2layout(board: Board): Option[Layout] = {
     var result = Map[Coord, String]()
@@ -75,7 +84,19 @@ trait Hakoiri {
       }
       (result, tempHist)
     }
-    step(List(List(start)), Set()) match {
+
+    @tailrec
+    def stepLoop(count: Int, paths: List[Path], history: Set[String]): (List[Path], Set[String]) = {
+      val (newPaths, newHistory) = step(paths, history)
+      println(s"ステップ ${count}, 経路パターン数 ${newPaths.size}, 履歴数 ${newHistory.size}")
+      val goal = newPaths.filter { path => isGoal(path.head) }
+      if (goal.isEmpty)
+        stepLoop(count + 1, newPaths, newHistory)
+      else
+        (goal, newHistory)
+    }
+
+    stepLoop(1, List(List(start)), Set()) match {
       case (result, _) => result
     }
   }
