@@ -1,38 +1,41 @@
 package hakoiri
 
+import scala.Option.option2Iterable
 import scala.annotation.tailrec
 
 object Solver extends App with Hakoiri {
   val width = 4
   val height = 5
   val start: Board = Seq(
-    Koma("A", 1, 0, 2, 2),
-    Koma("B", 0, 0, 1, 2),
-    Koma("C", 3, 0, 1, 2),
-    Koma("D", 0, 2, 1, 2),
-    Koma("E", 3, 2, 1, 2),
-    Koma("F", 1, 2, 2, 1),
-    Koma("G", 1, 3, 1, 1),
-    Koma("H", 2, 3, 1, 1),
-    Koma("I", 0, 4, 1, 1),
-    Koma("J", 3, 4, 1, 1))
+    Koma("A", "A", 1, 0, 2, 2),
+    Koma("B", "B", 0, 0, 1, 2),
+    Koma("C", "B", 3, 0, 1, 2),
+    Koma("D", "B", 0, 2, 1, 2),
+    Koma("E", "B", 3, 2, 1, 2),
+    Koma("F", "B", 1, 2, 2, 1),
+    Koma("G", "G", 1, 3, 1, 1),
+    Koma("H", "G", 2, 3, 1, 1),
+    Koma("I", "G", 0, 4, 1, 1),
+    Koma("J", "G", 3, 4, 1, 1))
 
   def isGoal(board: Board): Boolean =
     board exists { koma =>
       koma.name == "A" && koma.x == 1 && koma.y == 3
     }
 
-  solve(start).zipWithIndex foreach {
-    case (path, number) =>
-      println(s"解 ${number}")
-      path.reverse.zipWithIndex foreach {
-        case (board, step) =>
-          println(s"[STEP ${step}]")
-          board2layout(board) foreach { layout =>
-            println(layout2string(layout))
-          }
-          println()
-      }
+  for {
+    (path, number) <- solve(start).zipWithIndex
+  } {
+    println(s"解 ${number}")
+    for {
+      (board, step) <- path.zipWithIndex
+      layout <- board2layout(board) { _.name }
+      layoutStr = layout2string(layout)
+    } {
+      println(s"[STEP ${step}]")
+      println(layoutStr)
+      println()
+    }
   }
 }
 
@@ -48,13 +51,16 @@ trait Hakoiri {
 
   def isGoal(board: Board): Boolean
 
-  def board2layout(board: Board): Option[Layout] = {
+  def board2layout(board: Board)(f: Koma => String): Option[Layout] = {
     var result = Map[Coord, String]()
-    for (koma <- board; coord <- koma.coords) yield {
+    for {
+      koma <- board
+      coord <- koma.coords
+    } yield {
       if (result contains coord)
         return None
       else
-        result = result + ((coord, koma.name))
+        result = result + ((coord, f(koma)))
     }
     Some(result)
   }
@@ -76,8 +82,9 @@ trait Hakoiri {
         koma <- current
         moved <- koma.move
         next = current map { km => if (km == koma) moved else km }
-        layoutOpt = board2layout(next) if (layoutOpt.isDefined)
-        layoutStr = layout2string(layoutOpt.get) if (!(tempHist contains layoutStr))
+        layout <- board2layout(next) { _.kind }
+        layoutStr = layout2string(layout)
+        if (!(tempHist contains layoutStr))
       } yield {
         tempHist = tempHist + layoutStr
         next :: path
@@ -89,28 +96,35 @@ trait Hakoiri {
     def stepLoop(count: Int, paths: List[Path], history: Set[String]): (List[Path], Set[String]) = {
       val (newPaths, newHistory) = step(paths, history)
       println(s"ステップ ${count}, 経路パターン数 ${newPaths.size}, 履歴数 ${newHistory.size}")
-      val goal = newPaths.filter { path => isGoal(path.head) }
-      if (goal.isEmpty)
-        stepLoop(count + 1, newPaths, newHistory)
-      else
-        (goal, newHistory)
+      if (count >= 1000)
+        (newPaths, newHistory)
+      else {
+        val goal = newPaths.filter { path => isGoal(path.head) }
+        if (goal.isEmpty)
+          stepLoop(count + 1, newPaths, newHistory)
+        else
+          (goal, newHistory)
+      }
     }
 
-    stepLoop(1, List(List(start)), Set()) match {
-      case (result, _) => result
+    val result = for {
+      layout <- board2layout(start) { _.kind }
+      layoutStr = layout2string(layout)
+      (answer, _) = stepLoop(1, List(List(start)), Set(layoutStr))
+    } yield {
+      answer map { _.reverse }
     }
+    result.get
   }
 
-  case class Koma(name: String, x: Int, y: Int, w: Int, h: Int) {
+  case class Koma(name: String, kind: String, x: Int, y: Int, w: Int, h: Int) {
     def move: List[Koma] =
       for {
-        dx <- List(-1, 0, 1)
-        dy <- List(-1, 0, 1)
+        dx <- List(-1, 0, 1) if (x + dx >= 0 && x + dx + (w - 1) <= width - 1)
+        dy <- List(-1, 0, 1) if (y + dy >= 0 && y + dy + (h - 1) <= height - 1)
         if ((dx == 0 && dy != 0) || (dx != 0 && dy == 0))
-        if (x + dx >= 0 && x + dx + (w - 1) <= width - 1)
-        if (y + dy >= 0 && y + dy + (h - 1) <= height - 1)
       } yield {
-        Koma(name, x + dx, y + dy, w, h)
+        Koma(name, kind, x + dx, y + dy, w, h)
       }
     def coords: Seq[Coord] =
       for {
