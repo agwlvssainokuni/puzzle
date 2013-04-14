@@ -52,23 +52,24 @@ trait Hakoiri {
   def isGoal(board: Board): Boolean
 
   def board2layout(board: Board)(f: Koma => String): Option[Layout] = {
-    var result = Map[Coord, String]()
-    for {
+    val entries = for {
       koma <- board
       coord <- koma.coords
     } yield {
-      if (result contains coord)
-        return None
-      else
-        result = result + ((coord, f(koma)))
+      (coord, f(koma))
     }
-    Some(result)
+    Map[Coord, String](entries: _*) match {
+      case layout if layout.size == entries.size =>
+        Some(layout)
+      case _ =>
+        None
+    }
   }
 
-  def layout2string(board: Layout): String = {
+  def layout2string(layout: Layout, spacer: String = " "): String = {
     (for (y <- 0 until height) yield {
       (for (x <- 0 until width) yield {
-        board.get((x, y)) getOrElse " "
+        layout.get((x, y)) getOrElse spacer
       }).mkString
     }).mkString("\n")
   }
