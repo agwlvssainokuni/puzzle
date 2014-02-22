@@ -1,19 +1,22 @@
 package cherry.calc10.node;
 
+import org.apache.commons.lang3.math.Fraction;
+
 public class NumberNode implements Node {
 
-	private final int number;
+	private final Fraction number;
 
 	public NumberNode(int num) {
-		number = num;
+		number = Fraction.getFraction(num, 1);
 	}
 
-	public int value() {
+	@Override
+	public Fraction value() {
 		return number;
 	}
 
 	public String expression() {
-		return String.valueOf(number);
+		return String.valueOf(number.intValue());
 	}
 
 }

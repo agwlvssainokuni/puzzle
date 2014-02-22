@@ -2,6 +2,7 @@ package cherry.calc10.node;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.commons.lang3.math.Fraction;
 import org.junit.Test;
 
 public class AdditionNodeTest {
@@ -9,9 +10,9 @@ public class AdditionNodeTest {
 	@Test
 	public void testValue() {
 		Node node1 = new AdditionNode(new NumberNode(0), new NumberNode(9));
-		assertEquals(9, node1.value());
+		assertEquals(Fraction.getFraction(9, 1), node1.value());
 		Node node2 = new AdditionNode(new NumberNode(2), new NumberNode(8));
-		assertEquals(10, node2.value());
+		assertEquals(Fraction.getFraction(10, 1), node2.value());
 	}
 
 	@Test

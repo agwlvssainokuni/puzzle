@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.math.Fraction;
 import org.junit.Test;
 
 import cherry.calc10.node.Node;
@@ -20,13 +21,13 @@ public class CombinatorTest {
 		Node node1 = new NumberNode(2);
 		List<Node> combination = combinator.combine(node0, node1);
 		assertEquals(4, combination.size());
-		assertEquals(4, combination.get(0).value());
+		assertEquals(Fraction.getFraction(4, 1), combination.get(0).value());
 		assertEquals("(2+2)", combination.get(0).expression());
-		assertEquals(4, combination.get(1).value());
+		assertEquals(Fraction.getFraction(4, 1), combination.get(1).value());
 		assertEquals("(2*2)", combination.get(1).expression());
-		assertEquals(0, combination.get(2).value());
+		assertEquals(Fraction.ZERO, combination.get(2).value());
 		assertEquals("(2-2)", combination.get(2).expression());
-		assertEquals(1, combination.get(3).value());
+		assertEquals(Fraction.ONE, combination.get(3).value());
 		assertEquals("(2/2)", combination.get(3).expression());
 	}
 
@@ -37,13 +38,13 @@ public class CombinatorTest {
 		Node node2 = new NumberNode(2);
 		Node node3 = new NumberNode(3);
 		List<Node> combination = combinator.combine(node2, node3);
-		assertEquals(3, combination.size());
-		assertEquals(5, combination.get(0).value());
+		assertEquals(4, combination.size());
+		assertEquals(Fraction.getFraction(5, 1), combination.get(0).value());
 		assertEquals("(2+3)", combination.get(0).expression());
-		assertEquals(6, combination.get(1).value());
+		assertEquals(Fraction.getFraction(6, 1), combination.get(1).value());
 		assertEquals("(2*3)", combination.get(1).expression());
-		assertEquals(1, combination.get(2).value());
-		assertEquals("(3-2)", combination.get(2).expression());
+		assertEquals(Fraction.ONE.negate(), combination.get(2).value());
+		assertEquals("(2-3)", combination.get(2).expression());
 	}
 
 	@Test
@@ -54,14 +55,14 @@ public class CombinatorTest {
 		Node node6 = new NumberNode(6);
 		List<Node> combination = combinator.combine(node2, node6);
 		assertEquals(4, combination.size());
-		assertEquals(8, combination.get(0).value());
+		assertEquals(Fraction.getFraction(8, 1), combination.get(0).value());
 		assertEquals("(2+6)", combination.get(0).expression());
-		assertEquals(12, combination.get(1).value());
+		assertEquals(Fraction.getFraction(12, 1), combination.get(1).value());
 		assertEquals("(2*6)", combination.get(1).expression());
-		assertEquals(4, combination.get(2).value());
-		assertEquals("(6-2)", combination.get(2).expression());
-		assertEquals(3, combination.get(3).value());
-		assertEquals("(6/2)", combination.get(3).expression());
+		assertEquals(Fraction.getFraction(-4, 1), combination.get(2).value());
+		assertEquals("(2-6)", combination.get(2).expression());
+		assertEquals(Fraction.getFraction(1, 3), combination.get(3).value());
+		assertEquals("(2/6)", combination.get(3).expression());
 	}
 
 	@Test
@@ -77,14 +78,14 @@ public class CombinatorTest {
 
 		List<Node> combination = combinator.combine(nodes2, nodes6);
 		assertEquals(4, combination.size());
-		assertEquals(8, combination.get(0).value());
+		assertEquals(Fraction.getFraction(8, 1), combination.get(0).value());
 		assertEquals("(2+6)", combination.get(0).expression());
-		assertEquals(12, combination.get(1).value());
+		assertEquals(Fraction.getFraction(12, 1), combination.get(1).value());
 		assertEquals("(2*6)", combination.get(1).expression());
-		assertEquals(4, combination.get(2).value());
-		assertEquals("(6-2)", combination.get(2).expression());
-		assertEquals(3, combination.get(3).value());
-		assertEquals("(6/2)", combination.get(3).expression());
+		assertEquals(Fraction.getFraction(-4, 1), combination.get(2).value());
+		assertEquals("(2-6)", combination.get(2).expression());
+		assertEquals(Fraction.getFraction(1, 3), combination.get(3).value());
+		assertEquals("(2/6)", combination.get(3).expression());
 	}
 
 	@Test
@@ -102,23 +103,27 @@ public class CombinatorTest {
 
 		List<Node> combination = combinator.combine(nodes23, nodes45);
 
-		assertEquals(13, combination.size());
-		assertEquals("(2+4)", combination.get(0).expression());
-		assertEquals("(2*4)", combination.get(1).expression());
-		assertEquals("(4-2)", combination.get(2).expression());
-		assertEquals("(4/2)", combination.get(3).expression());
+		assertEquals(16, combination.size());
+		int index = 0;
+		assertEquals("(2+4)", combination.get(index++).expression());
+		assertEquals("(2*4)", combination.get(index++).expression());
+		assertEquals("(2-4)", combination.get(index++).expression());
+		assertEquals("(2/4)", combination.get(index++).expression());
 
-		assertEquals("(2+5)", combination.get(4).expression());
-		assertEquals("(2*5)", combination.get(5).expression());
-		assertEquals("(5-2)", combination.get(6).expression());
+		assertEquals("(2+5)", combination.get(index++).expression());
+		assertEquals("(2*5)", combination.get(index++).expression());
+		assertEquals("(2-5)", combination.get(index++).expression());
+		assertEquals("(2/5)", combination.get(index++).expression());
 
-		assertEquals("(3+4)", combination.get(7).expression());
-		assertEquals("(3*4)", combination.get(8).expression());
-		assertEquals("(4-3)", combination.get(9).expression());
+		assertEquals("(3+4)", combination.get(index++).expression());
+		assertEquals("(3*4)", combination.get(index++).expression());
+		assertEquals("(3-4)", combination.get(index++).expression());
+		assertEquals("(3/4)", combination.get(index++).expression());
 
-		assertEquals("(3+5)", combination.get(10).expression());
-		assertEquals("(3*5)", combination.get(11).expression());
-		assertEquals("(5-3)", combination.get(12).expression());
+		assertEquals("(3+5)", combination.get(index++).expression());
+		assertEquals("(3*5)", combination.get(index++).expression());
+		assertEquals("(3-5)", combination.get(index++).expression());
+		assertEquals("(3/5)", combination.get(index++).expression());
 	}
 
 	@Test
@@ -131,7 +136,7 @@ public class CombinatorTest {
 
 		List<Node> combination = combinator.combine(nodes1);
 		assertEquals(1, combination.size());
-		assertEquals(1, combination.get(0).value());
+		assertEquals(Fraction.ONE, combination.get(0).value());
 	}
 
 	@Test
@@ -147,8 +152,8 @@ public class CombinatorTest {
 		assertEquals(4, combination.size());
 		assertEquals("(1+2)", combination.get(0).expression());
 		assertEquals("(1*2)", combination.get(1).expression());
-		assertEquals("(2-1)", combination.get(2).expression());
-		assertEquals("(2/1)", combination.get(3).expression());
+		assertEquals("(1-2)", combination.get(2).expression());
+		assertEquals("(1/2)", combination.get(3).expression());
 	}
 
 	@Test
@@ -162,62 +167,72 @@ public class CombinatorTest {
 		nodes123.add(new NumberNode(3));
 
 		List<Node> combination = combinator.combine(nodes123);
-		assertEquals(40, combination.size());
+		assertEquals(48, combination.size());
+
+		int index = 0;
 
 		// [0]
-		assertEquals("(1+(2+3))", combination.get(0).expression());
-		assertEquals("(1*(2+3))", combination.get(1).expression());
-		assertEquals("((2+3)-1)", combination.get(2).expression());
-		assertEquals("((2+3)/1)", combination.get(3).expression());
+		assertEquals("(1+(2+3))", combination.get(index++).expression());
+		assertEquals("(1*(2+3))", combination.get(index++).expression());
+		assertEquals("(1-(2+3))", combination.get(index++).expression());
+		assertEquals("(1/(2+3))", combination.get(index++).expression());
 
-		assertEquals("(1+(2*3))", combination.get(4).expression());
-		assertEquals("(1*(2*3))", combination.get(5).expression());
-		assertEquals("((2*3)-1)", combination.get(6).expression());
-		assertEquals("((2*3)/1)", combination.get(7).expression());
+		assertEquals("(1+(2*3))", combination.get(index++).expression());
+		assertEquals("(1*(2*3))", combination.get(index++).expression());
+		assertEquals("(1-(2*3))", combination.get(index++).expression());
+		assertEquals("(1/(2*3))", combination.get(index++).expression());
 
-		assertEquals("(1+(3-2))", combination.get(8).expression());
-		assertEquals("(1*(3-2))", combination.get(9).expression());
-		assertEquals("(1-(3-2))", combination.get(10).expression());
-		assertEquals("(1/(3-2))", combination.get(11).expression());
+		assertEquals("(1+(2-3))", combination.get(index++).expression());
+		assertEquals("(1*(2-3))", combination.get(index++).expression());
+		assertEquals("(1-(2-3))", combination.get(index++).expression());
+		assertEquals("(1/(2-3))", combination.get(index++).expression());
+
+		assertEquals("(1+(2/3))", combination.get(index++).expression());
+		assertEquals("(1*(2/3))", combination.get(index++).expression());
+		assertEquals("(1-(2/3))", combination.get(index++).expression());
+		assertEquals("(1/(2/3))", combination.get(index++).expression());
 
 		// [1]
-		assertEquals("(2+(1+3))", combination.get(12).expression());
-		assertEquals("(2*(1+3))", combination.get(13).expression());
-		assertEquals("((1+3)-2)", combination.get(14).expression());
-		assertEquals("((1+3)/2)", combination.get(15).expression());
+		assertEquals("(2+(1+3))", combination.get(index++).expression());
+		assertEquals("(2*(1+3))", combination.get(index++).expression());
+		assertEquals("(2-(1+3))", combination.get(index++).expression());
+		assertEquals("(2/(1+3))", combination.get(index++).expression());
 
-		assertEquals("(2+(1*3))", combination.get(16).expression());
-		assertEquals("(2*(1*3))", combination.get(17).expression());
-		assertEquals("((1*3)-2)", combination.get(18).expression());
+		assertEquals("(2+(1*3))", combination.get(index++).expression());
+		assertEquals("(2*(1*3))", combination.get(index++).expression());
+		assertEquals("(2-(1*3))", combination.get(index++).expression());
+		assertEquals("(2/(1*3))", combination.get(index++).expression());
 
-		assertEquals("(2+(3-1))", combination.get(19).expression());
-		assertEquals("(2*(3-1))", combination.get(20).expression());
-		assertEquals("(2-(3-1))", combination.get(21).expression());
-		assertEquals("(2/(3-1))", combination.get(22).expression());
+		assertEquals("(2+(1-3))", combination.get(index++).expression());
+		assertEquals("(2*(1-3))", combination.get(index++).expression());
+		assertEquals("(2-(1-3))", combination.get(index++).expression());
+		assertEquals("(2/(1-3))", combination.get(index++).expression());
 
-		assertEquals("(2+(3/1))", combination.get(23).expression());
-		assertEquals("(2*(3/1))", combination.get(24).expression());
-		assertEquals("((3/1)-2)", combination.get(25).expression());
+		assertEquals("(2+(1/3))", combination.get(index++).expression());
+		assertEquals("(2*(1/3))", combination.get(index++).expression());
+		assertEquals("(2-(1/3))", combination.get(index++).expression());
+		assertEquals("(2/(1/3))", combination.get(index++).expression());
 
 		// [2]
-		assertEquals("(3+(1+2))", combination.get(26).expression());
-		assertEquals("(3*(1+2))", combination.get(27).expression());
-		assertEquals("(3-(1+2))", combination.get(28).expression());
-		assertEquals("(3/(1+2))", combination.get(29).expression());
+		assertEquals("(3+(1+2))", combination.get(index++).expression());
+		assertEquals("(3*(1+2))", combination.get(index++).expression());
+		assertEquals("(3-(1+2))", combination.get(index++).expression());
+		assertEquals("(3/(1+2))", combination.get(index++).expression());
 
-		assertEquals("(3+(1*2))", combination.get(30).expression());
-		assertEquals("(3*(1*2))", combination.get(31).expression());
-		assertEquals("(3-(1*2))", combination.get(32).expression());
+		assertEquals("(3+(1*2))", combination.get(index++).expression());
+		assertEquals("(3*(1*2))", combination.get(index++).expression());
+		assertEquals("(3-(1*2))", combination.get(index++).expression());
+		assertEquals("(3/(1*2))", combination.get(index++).expression());
 
-		assertEquals("(3+(2-1))", combination.get(33).expression());
-		assertEquals("(3*(2-1))", combination.get(34).expression());
-		assertEquals("(3-(2-1))", combination.get(35).expression());
-		assertEquals("(3/(2-1))", combination.get(36).expression());
+		assertEquals("(3+(1-2))", combination.get(index++).expression());
+		assertEquals("(3*(1-2))", combination.get(index++).expression());
+		assertEquals("(3-(1-2))", combination.get(index++).expression());
+		assertEquals("(3/(1-2))", combination.get(index++).expression());
 
-		assertEquals("(3+(2/1))", combination.get(37).expression());
-		assertEquals("(3*(2/1))", combination.get(38).expression());
-		assertEquals("(3-(2/1))", combination.get(39).expression());
-
+		assertEquals("(3+(1/2))", combination.get(index++).expression());
+		assertEquals("(3*(1/2))", combination.get(index++).expression());
+		assertEquals("(3-(1/2))", combination.get(index++).expression());
+		assertEquals("(3/(1/2))", combination.get(index++).expression());
 	}
 
 }

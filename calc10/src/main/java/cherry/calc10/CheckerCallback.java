@@ -2,7 +2,6 @@ package cherry.calc10;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import cherry.calc10.Permutation.Callback;
@@ -32,11 +31,11 @@ public class CheckerCallback implements Callback {
 
 		List<Node> combination = combinator.combine(nodes);
 
-		List<Node> succeeded = new LinkedList<Node>();
+		List<Node> succeeded = new ArrayList<Node>();
 		Iterator<Node> iter = combination.iterator();
 		while (iter.hasNext()) {
 			Node node = iter.next();
-			if (node.value() == 10) {
+			if (node.value().doubleValue() == 10.0) {
 				succeeded.add(node);
 			}
 		}

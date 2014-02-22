@@ -1,8 +1,10 @@
 package cherry.calc10.node;
 
+import org.apache.commons.lang3.math.Fraction;
+
 public interface Node {
 
-	int value();
+	Fraction value();
 
 	String expression();
 
