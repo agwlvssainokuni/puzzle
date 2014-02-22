@@ -1,0 +1,19 @@
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+*~
+*.swp
+*.zip
+*.tgz
+.DS_Store
+/.gradle
+/gradle-app.setting
+/bin
+/.classpath
+/.project
+/.settings
+/build
