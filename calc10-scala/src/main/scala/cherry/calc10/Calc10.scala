@@ -33,7 +33,7 @@ object Calc10 extends App with Logging {
   } {
     (for {
       node <- combinations(Seq(node(i), node(j), node(k), node(l)))
-      if node.value.equals(TEN)
+      if node.value == TEN
     } yield node.expression).distinct match {
       case result =>
         logger.info(Seq(
@@ -59,7 +59,7 @@ object Calc10 extends App with Logging {
           AddNode(op1, op2),
           MulNode(op1, op2),
           SubNode(op1, op2)) ++
-          (if (!op2.isZero)
+          (if (op2.value != Fraction.ZERO)
             Seq(DivNode(op1, op2))
           else Seq())
       }).flatten
@@ -69,7 +69,6 @@ object Calc10 extends App with Logging {
 trait Node {
   val value: Fraction
   val expression: String
-  def isZero = value.equals(Fraction.ZERO)
 }
 
 trait OpNode extends Node {
