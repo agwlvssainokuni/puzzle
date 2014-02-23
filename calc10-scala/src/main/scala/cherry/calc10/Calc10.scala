@@ -58,13 +58,9 @@ object Calc10 extends App with Logging {
         Seq(
           AddNode(op1, op2),
           MulNode(op1, op2),
-          SubNode(op1, op2),
-          SubNode(op2, op1)) ++
+          SubNode(op1, op2)) ++
           (if (!op2.isZero)
             Seq(DivNode(op1, op2))
-          else Seq()) ++
-          (if (!op1.isZero)
-            Seq(DivNode(op2, op1))
           else Seq())
       }).flatten
 
